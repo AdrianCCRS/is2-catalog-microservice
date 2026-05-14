@@ -1,4 +1,5 @@
 using CatalogService.API.DTOs;
+using CatalogService.API.Filters;
 using CatalogService.Domain.Entities;
 using CatalogService.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -92,6 +93,7 @@ namespace CatalogService.API.Controllers
         /// Crear nueva categoría
         /// </summary>
         [HttpPost]
+        [AdminAuthorize]
         public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
         {
             // Validaciones
@@ -129,6 +131,7 @@ namespace CatalogService.API.Controllers
         /// Actualizar categoría
         /// </summary>
         [HttpPut("{id}")]
+        [AdminAuthorize]
         public async Task<IActionResult> Update(string id, [FromBody] UpdateCategoryRequest request)
         {
             var existingCategory = await _repository.GetByIdAsync(id);
@@ -169,6 +172,7 @@ namespace CatalogService.API.Controllers
         /// Eliminar categoría
         /// </summary>
         [HttpDelete("{id}")]
+        [AdminAuthorize]
         public async Task<IActionResult> Delete(string id)
         {
             var existingCategory = await _repository.GetByIdAsync(id);

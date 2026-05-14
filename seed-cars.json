@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Toyota Corolla 2024",
+    "description": "Sedán confiable y económico con 2.0L 168 HP, transmisión automática, equipamiento completo",
+    "price": 28500,
+    "stock": 12,
+    "categoryId": null,
+    "images": ["/images/Toyota Corolla 2024.jpg"],
+    "tags": ["sedan", "economico", "confiable"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Honda Accord 2024",
+    "description": "Sedan premium con motor 1.5T 192 HP, interior lujoso, tecnología avanzada",
+    "price": 32900,
+    "stock": 8,
+    "categoryId": null,
+    "images": ["/images/Honda accord 2024.jpg"],
+    "tags": ["sedan", "premium", "lujo"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Chevrolet Spark GT",
+    "description": "Citadín ágil con motor 1.2L 94 HP, diseño moderno, ideal para ciudad",
+    "price": 16800,
+    "stock": 15,
+    "categoryId": null,
+    "images": ["/images/Chevrolet Spark GT.jpg"],
+    "tags": ["city", "compacto", "economico"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Ford Fusion 2023",
+    "description": "Sedan deportivo con motor 1.5L EcoBoost 181 HP, diseño aerodinámico",
+    "price": 26500,
+    "stock": 10,
+    "categoryId": null,
+    "images": ["/images/Ford Fusion 2023.jpg"],
+    "tags": ["sedan", "deportivo", "fusion"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Hyundai Elantra 2024",
+    "description": "Sedan moderno con motor 2.0L 147 HP, conectividad inteligente",
+    "price": 24900,
+    "stock": 14,
+    "categoryId": null,
+    "images": ["/images/Hyundai Elantra 2024.jpg"],
+    "tags": ["sedan", "moderno", "conectado"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Nissan Sentra 2024",
+    "description": "Sedan confiable con motor 2.0L 149 HP, gran espacio interior",
+    "price": 25200,
+    "stock": 11,
+    "categoryId": null,
+    "images": ["/images/Nissan-Sentra-2024.jpg"],
+    "tags": ["sedan", "espacioso", "confiable"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Kia Optima 2024",
+    "description": "Sedan elegante con motor 2.0L 181 HP, diseño sofisticado",
+    "price": 29500,
+    "stock": 9,
+    "categoryId": null,
+    "images": ["/images/Kia Optima 2024.jpg"],
+    "tags": ["sedan", "elegante", "sofisticado"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Honda City 2023",
+    "description": "Compacto versátil con motor 1.5L 121 HP, flexible y práctico",
+    "price": 19800,
+    "stock": 13,
+    "categoryId": null,
+    "images": ["/images/Honda City 2023.jpg"],
+    "tags": ["compacto", "versatil", "practico"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Ford Fiesta 2023",
+    "description": "Hatchback deportivo con motor 1.6L 120 HP, diseño juvenil",
+    "price": 18900,
+    "stock": 16,
+    "categoryId": null,
+    "images": ["/images/Ford-Fiesta-2023.jpg"],
+    "tags": ["hatchback", "deportivo", "juvenil"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Hyundai i10 GLS",
+    "description": "Citadín económico con motor 1.0L 68 HP, perfecto para ciudad",
+    "price": 14500,
+    "stock": 18,
+    "categoryId": null,
+    "images": ["/images/Hyundai i10 GLS.jpg"],
+    "tags": ["city", "economico", "urbano"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Chevrolet Aveo 2023",
+    "description": "Sedan accesible con motor 1.6L 105 HP, entrada a la gama media",
+    "price": 17900,
+    "stock": 14,
+    "categoryId": null,
+    "images": ["/images/Chevrolet-Aveo-2023.jpg"],
+    "tags": ["sedan", "accesible", "economico"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Toyota Yaris 2024",
+    "description": "Hatchback eficiente con motor 1.3L 101 HP, bajo consumo",
+    "price": 20200,
+    "stock": 10,
+    "categoryId": null,
+    "images": ["/images/toyota yaris 2024.jpg"],
+    "tags": ["hatchback", "eficiente", "economico"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Kia Picanto 2024",
+    "description": "Citadín versátil con motor 1.0L 67 HP, maniobrabilidad excepcional",
+    "price": 15600,
+    "stock": 17,
+    "categoryId": null,
+    "images": ["/images/Kia-Picanto-2024.jpg"],
+    "tags": ["city", "versatil", "compacto"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Nissan Versa 2024",
+    "description": "Sedan práctico con motor 1.6L 122 HP, excelente relación valor",
+    "price": 19500,
+    "stock": 12,
+    "categoryId": null,
+    "images": ["/images/Nissan-Versa 2024.jpg"],
+    "tags": ["sedan", "practico", "economico"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Mazda 3 2024",
+    "description": "Hatchback deportivo con motor 2.0L 155 HP, manejo ágil y preciso",
+    "price": 27300,
+    "stock": 9,
+    "categoryId": null,
+    "images": ["/images/Mazda 3 2024.jpeg"],
+    "tags": ["hatchback", "deportivo", "agil"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Hyundai Sonata 2024",
+    "description": "Sedan fullsize con motor 2.5L 191 HP, lujo y confort",
+    "price": 34200,
+    "stock": 7,
+    "categoryId": null,
+    "images": ["/images/Hyundai Sonata 2024.jpg"],
+    "tags": ["fullsize", "lujo", "confort"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Chevrolet Cruze 2024",
+    "description": "Sedan robusto con motor 1.4T 153 HP, construcción sólida",
+    "price": 24600,
+    "stock": 11,
+    "categoryId": null,
+    "images": ["/images/Chevrolet-Cruze 2024.jpg"],
+    "tags": ["sedan", "robusto", "confiable"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Volkswagen Polo Track 2024",
+    "description": "Compacto versátil con motor 1.6L 110 HP, tecnología alemana",
+    "price": 22800,
+    "stock": 10,
+    "categoryId": null,
+    "images": ["/images/Volkswagen-Polo-Track-2024.jpg"],
+    "tags": ["compacto", "aleman", "versatil"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Volkswagen Passat 2024",
+    "description": "Sedan ejecutivo con motor 2.0L TSI 220 HP, lujo y desempeño",
+    "price": 38900,
+    "stock": 5,
+    "categoryId": null,
+    "images": ["/images/Volswagen Passat 2024.jpg"],
+    "tags": ["ejecutivo", "lujo", "potencia"],
+    "createdBy": "admin@tienda.com"
+  },
+  {
+    "name": "Renault Twingo Zen",
+    "description": "Citadín francés con motor 1.0L 70 HP, diseño retro moderno",
+    "price": 16200,
+    "stock": 13,
+    "categoryId": null,
+    "images": ["/images/renault twingo zen.jpeg"],
+    "tags": ["city", "frances", "retro"],
+    "createdBy": "admin@tienda.com"
+  }
+]

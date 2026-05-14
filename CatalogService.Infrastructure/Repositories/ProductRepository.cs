@@ -75,5 +75,12 @@ namespace CatalogService.Infrastructure.Repositories
                 .Set(p => p.UpdatedAt, DateTime.UtcNow);
             await _products.UpdateOneAsync(p => p.Id == id, update);
         }
+
+        public async Task DeleteAllAsync()
+        {
+            // Borrado físico para limpiar colección completamente
+            var filter = Builders<Product>.Filter.Empty;
+            await _products.DeleteManyAsync(filter);
+        }
     }
 }

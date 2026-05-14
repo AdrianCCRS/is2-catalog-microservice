@@ -10,5 +10,6 @@ namespace CatalogService.Domain.Interfaces
         Task CreateAsync(Product product);
         Task UpdateAsync(Product product);
         Task DeleteAsync(string id);
+        Task DeleteAllAsync();
     }
 }
