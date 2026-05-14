@@ -16,21 +16,8 @@ export const Header: React.FC = () => {
         </Link>
 
         {/* Búsqueda */}
-        <div className="flex-1 mx-8">
-          <input
-            type="text"
-            placeholder="Buscar vehículos..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                const value = (e.target as HTMLInputElement).value;
-                if (value.trim()) {
-                  navigate(`/?search=${encodeURIComponent(value)}`);
-                }
-              }
-            }}
-          />
-        </div>
+
+        
 
         {/* Carrito */}
         <Link

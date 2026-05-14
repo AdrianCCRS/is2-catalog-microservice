@@ -7,9 +7,12 @@ import { Product } from '@/types';
 export const HomePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000000);
+  const [maxPrice, setMaxPrice] = useState(100000000);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -18,17 +21,80 @@ export const HomePage: React.FC = () => {
   const { data: categoriesData } = useCategories();
   const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
+  // Función para extraer la marca del nombre del producto
+  const extractBrand = (name: string): string => {
+    const firstWord = name.split(' ')[0];
+    return firstWord;
+  };
+
+  // Función para extraer el año del nombre del producto
+  const extractYear = (name: string): number | null => {
+    const match = name.match(/\b(20\d{2})\b/);
+    return match ? parseInt(match[1]) : null;
+  };
+
+  // Extraer marcas y años únicos de los productos
+  const brands = Array.from(
+    new Set((productsData?.results || []).map(product => extractBrand(product.name)))
+  ).filter(Boolean) as string[];
+
+  const years = Array.from(
+    new Set(
+      (productsData?.results || [])
+        .map(product => extractYear(product.name))
+        .filter((year) => year !== null)
+    )
+  ).sort((a, b) => b - a) as number[];
+
+  // Obtener rango de precios mínimo y máximo de los productos
+  const priceRange = {
+    min: Math.min(...(productsData?.results || [{ price: 0 }]).map(p => p.price)),
+    max: Math.max(...(productsData?.results || [{ price: 100000000 }]).map(p => p.price)),
+  };
+
+  // Filtrar productos localmente
+  const filteredProducts = (productsData?.results || []).filter(product => {
+    // Filtro por búsqueda
+    const matchesSearch = !searchQuery || 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Filtro por marca
+    const matchesBrand = !selectedBrand || extractBrand(product.name) === selectedBrand;
+
+    // Filtro por año
+    const matchesYear = !selectedYear || extractYear(product.name) === selectedYear;
+
+    // Filtro por precio
+    const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+
+    // Filtro por categoría
+    const matchesCategory = !selectedCategory || product.categoryId === selectedCategory;
+
+    return matchesSearch && matchesBrand && matchesYear && matchesPrice && matchesCategory;
+  });
+
   // Efectos para manejo de parámetros
   useEffect(() => {
     const search = searchParams.get('search');
     if (search) {
-      // Aquí podrías implementar búsqueda
-      console.log('Buscando:', search);
+      setSearchQuery(search);
+      setPage(1);
     }
   }, [searchParams]);
 
   const handleCategoryChange = (categoryId: string | null) => {
     setSelectedCategory(categoryId);
+    setPage(1);
+  };
+
+  const handleBrandChange = (brand: string | null) => {
+    setSelectedBrand(brand);
+    setPage(1);
+  };
+
+  const handleYearChange = (year: number | null) => {
+    setSelectedYear(year);
     setPage(1);
   };
 
@@ -43,13 +109,33 @@ export const HomePage: React.FC = () => {
     setIsDetailOpen(true);
   };
 
-  const totalPages = productsData?.total ? Math.ceil(productsData.total / pageSize) : 1;
+  // Calcular paginación local
+  const totalFilteredProducts = filteredProducts.length;
+  const totalPages = Math.ceil(totalFilteredProducts / pageSize);
+  const paginatedProducts = filteredProducts.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-2">Nuestro Catálogo de Vehículos</h1>
         <p className="text-gray-600 mb-8">Encuentra el auto perfecto para ti</p>
+
+        {/* Buscador */}
+        <div className="mb-8">
+          <input
+            type="text"
+            placeholder="Buscar vehículos por nombre, marca o características..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filtros */}
@@ -59,8 +145,14 @@ export const HomePage: React.FC = () => {
               selectedCategory={selectedCategory}
               minPrice={minPrice}
               maxPrice={maxPrice}
+              brands={brands}
+              selectedBrand={selectedBrand}
+              years={years}
+              selectedYear={selectedYear}
               onCategoryChange={handleCategoryChange}
               onPriceChange={handlePriceChange}
+              onBrandChange={handleBrandChange}
+              onYearChange={handleYearChange}
             />
           </div>
 
@@ -74,10 +166,10 @@ export const HomePage: React.FC = () => {
               <div className="text-center py-12">
                 <p className="text-red-600 text-lg">Error al cargar productos</p>
               </div>
-            ) : productsData?.results && productsData.results.length > 0 ? (
+            ) : paginatedProducts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {productsData.results.map((product) => (
+                  {paginatedProducts.map((product) => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -124,7 +216,7 @@ export const HomePage: React.FC = () => {
 
                 {/* Info de Paginación */}
                 <div className="text-center mt-4 text-gray-600">
-                  Página {page} de {totalPages} | Total: {productsData.total} productos
+                  Página {page} de {totalPages} | Total: {totalFilteredProducts} productos
                 </div>
               </>
             ) : (
