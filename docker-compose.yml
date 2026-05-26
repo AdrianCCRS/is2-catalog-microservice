@@ -9,7 +9,7 @@ services:
     volumes:
       - catalog_mongo_data:/data/db
     networks:
-      - search-network
+      - deploy_search-network
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 10s
@@ -37,12 +37,12 @@ services:
       mongo-catalog:
         condition: service_healthy
     networks:
-      - search-network
+      - deploy_search-network
     restart: always
 
 volumes:
   catalog_mongo_data:
 
 networks:
-  search-network:
+  deploy_search-network:
     external: true
