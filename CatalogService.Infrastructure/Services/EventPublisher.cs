@@ -111,7 +111,7 @@ namespace CatalogService.Infrastructure.Services
                     ContentType = "application/json"
                 };
 
-                await channel.BasicPublishAsync(ExchangeName, routingKey, properties, body);
+                await channel.BasicPublishAsync(ExchangeName, routingKey, false, properties, body);
 
                 _logger.LogInformation(
                     "Published {EventType} with routing key {RoutingKey} to {Exchange}",
