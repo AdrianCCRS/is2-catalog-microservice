@@ -1,13 +1,11 @@
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace CatalogService.Infrastructure.Services
 {
-    /// <summary>
-    /// Configuración de JWT
-    /// </summary>
     public class JwtSettings
     {
         public string Secret { get; set; } = string.Empty;
@@ -16,19 +14,12 @@ namespace CatalogService.Infrastructure.Services
         public int ExpirationMinutes { get; set; } = 60;
     }
 
-    /// <summary>
-    /// Interfaz para manejo de JWT
-    /// </summary>
     public interface IJwtService
     {
         string GenerateToken(string userId, string userName, List<string> roles);
         ClaimsPrincipal? ValidateToken(string token);
-        Dictionary<string, object?> ExtractClaims(string token);
     }
 
-    /// <summary>
-    /// Servicio de JWT para autenticación
-    /// </summary>
     public class JwtService : IJwtService
     {
         private readonly JwtSettings _jwtSettings;
@@ -42,58 +33,59 @@ namespace CatalogService.Infrastructure.Services
 
         public string GenerateToken(string userId, string userName, List<string> roles)
         {
-            // Este es un placeholder. En producción, usarías System.IdentityModel.Tokens.Jwt
-            // Para ahora, esto es solo una estructura de demostración
-            var claims = new Dictionary<string, object?>
+            var claims = new List<Claim>
             {
-                { "sub", userId },
-                { "name", userName },
-                { "roles", roles },
-                { "iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds() },
-                { "exp", DateTimeOffset.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes).ToUnixTimeSeconds() }
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Name, userName),
             };
 
-            _logger.LogInformation("Token generado para usuario: {UserId}", userId);
-            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(claims)));
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_jwtSettings.Secret));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
+                signingCredentials: creds
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            _logger.LogInformation("Token JWT generado para usuario: {UserId}", userId);
+            return tokenString;
         }
 
         public ClaimsPrincipal? ValidateToken(string token)
         {
             try
             {
-                var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
-                var claims = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object?>>(json);
+                var key = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_jwtSettings.Secret));
 
-                if (claims == null)
-                    return null;
-
-                var claimsList = new List<Claim>();
-                foreach (var claim in claims)
+                var handler = new JwtSecurityTokenHandler();
+                var result = handler.ValidateToken(token, new TokenValidationParameters
                 {
-                    claimsList.Add(new Claim(claim.Key, claim.Value?.ToString() ?? string.Empty));
-                }
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _jwtSettings.Issuer,
+                    ValidAudience = _jwtSettings.Audience,
+                    IssuerSigningKey = key,
+                }, out _);
 
-                return new ClaimsPrincipal(new ClaimsIdentity(claimsList));
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Error validando token JWT");
                 return null;
-            }
-        }
-
-        public Dictionary<string, object?> ExtractClaims(string token)
-        {
-            try
-            {
-                var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
-                return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object?>>(json) 
-                    ?? new Dictionary<string, object?>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error extrayendo claims del token");
-                return new Dictionary<string, object?>();
             }
         }
     }

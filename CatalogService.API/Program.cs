@@ -3,6 +3,9 @@ using CatalogService.Domain.Interfaces;
 using CatalogService.Infrastructure.Repositories;
 using CatalogService.Infrastructure.Services;
 using CatalogService.Infrastructure.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +36,25 @@ var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 builder.Services.AddSingleton(jwtSettings);
 builder.Services.AddScoped<IJwtService, JwtService>();
+
+// JWT Authentication
+var jwtSecret = jwtSettings.Secret;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSecret)),
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role,
+        };
+    });
 
 // Health Checks (RNF-02, RNF-08)
 builder.Services.AddHealthChecks();
@@ -82,6 +104,7 @@ app.MapHealthChecks("/health");
 app.MapGrpcService<CatalogGrpcService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a gRPC client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
