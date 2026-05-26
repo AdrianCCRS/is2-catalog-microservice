@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/services/apiClient';
+import { getAuthHeaders } from '@/services/authService';
 import { Product, PaginatedResponse, SearchDocument } from '@/types';
 
 export const useProducts = (page: number = 1, pageSize: number = 12) => {
@@ -23,7 +24,9 @@ export const useElasticsearchSearch = (query: string) => {
   return useQuery<Product[]>({
     queryKey: ['search', 'elasticsearch', query],
     queryFn: async () => {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) throw new Error('Search failed');
       const docs: SearchDocument[] = await res.json();
 
@@ -49,7 +52,9 @@ export const useSuggestions = (query: string) => {
   return useQuery<string[]>({
     queryKey: ['search', 'suggest', query],
     queryFn: async () => {
-      const res = await fetch(`/api/search/suggest?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/search/suggest?q=${encodeURIComponent(query)}`, {
+        headers: getAuthHeaders(),
+      });
       if (!res.ok) return [];
       return res.json();
     },
