@@ -31,11 +31,22 @@ export const CartPage: React.FC = () => {
                   className="flex gap-6 pb-6 border-b last:border-b-0 last:pb-0"
                 >
                   {/* Imagen */}
-                  <img
-                    src={item.product.images?.[0] || 'https://via.placeholder.com/120x120'}
-                    alt={item.product.name}
-                    className="w-24 h-24 object-cover rounded"
-                  />
+                  <div className="w-24 h-24 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                    {item.product.images?.[0] ? (
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                        Sin Imagen
+                      </div>
+                    )}
+                  </div>
 
                   {/* Información */}
                   <div className="flex-1">

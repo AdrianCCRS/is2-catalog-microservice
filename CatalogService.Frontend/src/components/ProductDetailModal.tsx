@@ -42,15 +42,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           {/* Imágenes */}
           <div>
             <div className="w-full h-96 bg-gray-200 rounded-lg overflow-hidden mb-4">
-              <img
-                src={product.images?.[activeImageIndex] ? `http://localhost:5290${product.images[activeImageIndex]}` : 'https://via.placeholder.com/500x400'}
-                alt={product.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = 'https://via.placeholder.com/500x400';
-                }}
-              />
+              {product.images?.[activeImageIndex] ? (
+                <img
+                  src={product.images[activeImageIndex]}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  Sin Imagen
+                </div>
+              )}
             </div>
             {product.images && product.images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto">
@@ -62,10 +67,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       idx === activeImageIndex ? 'border-primary' : 'border-gray-300'
                     }`}
                   >
-                    <img src={`http://localhost:5290${img}`} alt={`Imagen ${idx + 1}`} className="w-full h-full object-cover" onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      img.src = 'https://via.placeholder.com/100x100';
-                    }} />
+                    <img
+                      src={img}
+                      alt={`Imagen ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                   </button>
                 ))}
               </div>

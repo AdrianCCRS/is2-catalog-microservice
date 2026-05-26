@@ -25,15 +25,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onShowDetails
     >
       {/* Imagen */}
       <div className="w-full h-48 bg-gray-200 overflow-hidden">
-        <img
-          src={product.images?.[0] ? `http://localhost:5290${product.images[0]}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen'}
-          alt={product.name}
-          className="w-full h-full object-cover hover:scale-110 transition"
-          onError={(e) => {
-            const img = e.target as HTMLImageElement;
-            img.src = 'https://via.placeholder.com/400x300?text=Sin+Imagen';
-          }}
-        />
+        {product.images?.[0] ? (
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="w-full h-full object-cover hover:scale-110 transition"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+            Sin Imagen
+          </div>
+        )}
       </div>
 
       {/* Contenido */}
