@@ -18,7 +18,7 @@ namespace CatalogService.API.DTOs
     {
         public int? RowNumber { get; set; }
         public string Message { get; set; } = string.Empty;
-        public Dictionary<string, object> Data { get; set; } = new();
+        public Dictionary<string, object?>? Data { get; set; } = new();
     }
 
     public class ImportedProductDto

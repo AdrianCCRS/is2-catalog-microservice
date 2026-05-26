@@ -16,7 +16,7 @@ namespace CatalogService.API.DTOs
         public string UserName { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; }
         public string IpAddress { get; set; } = string.Empty;
-        public Dictionary<string, object> Changes { get; set; } = new();
+        public Dictionary<string, object?>? Changes { get; set; } = new();
         public string Description { get; set; } = string.Empty;
         public bool IsSuccessful { get; set; }
         public string? ErrorMessage { get; set; }

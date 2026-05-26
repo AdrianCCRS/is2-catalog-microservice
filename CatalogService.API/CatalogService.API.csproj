@@ -19,6 +19,8 @@
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.1.2" />
     <PackageReference Include="MongoDB.Driver" Version="3.7.1" />
     <PackageReference Include="RabbitMQ.Client" Version="7.0.0" />
+    <PackageReference Include="SharpCompress" Version="0.37.2" />
+    <PackageReference Include="Snappier" Version="1.1.6" />
   </ItemGroup>
 
   <ItemGroup>

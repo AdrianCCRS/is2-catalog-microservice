@@ -231,7 +231,7 @@ namespace CatalogService.Infrastructure.Services
                 Description = row.Description?.Trim() ?? string.Empty,
                 Price = row.Price,
                 Stock = row.Stock,
-                CategoryId = !string.IsNullOrWhiteSpace(row.CategoryId) ? row.CategoryId : null,
+                CategoryId = !string.IsNullOrWhiteSpace(row.CategoryId) ? row.CategoryId : string.Empty,
                 Images = images,
                 Tags = tags,
                 IsActive = true,

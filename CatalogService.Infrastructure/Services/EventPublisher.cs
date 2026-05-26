@@ -52,6 +52,7 @@ namespace CatalogService.Infrastructure.Services
         public string Timestamp { get; set; } = DateTime.UtcNow.ToString("o");
         public string ProductId { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public string DeletedBy { get; set; } = string.Empty;
     }
 
     public interface IEventPublisher
