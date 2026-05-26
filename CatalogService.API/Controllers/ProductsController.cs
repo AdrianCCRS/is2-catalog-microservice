@@ -146,10 +146,6 @@ namespace CatalogService.API.Controllers
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error publicando evento ProductCreated para producto {ProductId}", product.Id);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error publicando evento ProductCreated para producto {ProductId}", product.Id);
                     // No fallar la operación si el evento falla
                 }
 
