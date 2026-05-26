@@ -59,7 +59,7 @@ namespace CatalogService.Infrastructure.Services
         Task PublishAsync<T>(T @event, string? routingKey = null) where T : DomainEvent;
     }
 
-    public class EventPublisher : IEventPublisher, IDisposable
+    public class EventPublisher : IEventPublisher, IAsyncDisposable
     {
         private readonly IConnection _connection;
         private readonly ILogger<EventPublisher> _logger;
@@ -73,16 +73,15 @@ namespace CatalogService.Infrastructure.Services
                 HostName = configuration["RabbitMQ:Host"] ?? "localhost",
                 Port = int.Parse(configuration["RabbitMQ:Port"] ?? "5672"),
                 UserName = configuration["RabbitMQ:Username"] ?? "guest",
-                Password = configuration["RabbitMQ:Password"] ?? "guest",
-                AutomaticRecoveryEnabled = true,
-                NetworkRecoveryInterval = TimeSpan.FromSeconds(10)
+                Password = configuration["RabbitMQ:Password"] ?? "guest"
             };
 
             try
             {
-                _connection = factory.CreateConnection();
-                using var channel = _connection.CreateModel();
-                channel.ExchangeDeclare(ExchangeName, ExchangeType.Topic, durable: true);
+                _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                var channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+                channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Topic, durable: true).GetAwaiter().GetResult();
+                channel.CloseAsync().GetAwaiter().GetResult();
                 _logger.LogInformation("RabbitMQ connection established. Exchange '{Exchange}' declared.", ExchangeName);
             }
             catch (Exception ex)
@@ -104,19 +103,19 @@ namespace CatalogService.Infrastructure.Services
                 });
                 var body = Encoding.UTF8.GetBytes(message);
 
-                using var channel = _connection.CreateModel();
-                var properties = channel.CreateBasicProperties();
-                properties.Persistent = true;
-                properties.MessageId = @event.EventId;
-                properties.ContentType = "application/json";
+                await using var channel = await _connection.CreateChannelAsync();
+                var properties = new BasicProperties
+                {
+                    Persistent = true,
+                    MessageId = @event.EventId,
+                    ContentType = "application/json"
+                };
 
-                channel.BasicPublish(ExchangeName, routingKey, properties, body);
+                await channel.BasicPublishAsync(ExchangeName, routingKey, true, properties, body);
 
                 _logger.LogInformation(
                     "Published {EventType} with routing key {RoutingKey} to {Exchange}",
                     @event.GetType().Name, routingKey, ExchangeName);
-
-                await Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -132,10 +131,13 @@ namespace CatalogService.Infrastructure.Services
             _ => @event.GetType().Name.ToLower()
         };
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _connection?.Close();
-            _connection?.Dispose();
+            if (_connection != null)
+            {
+                await _connection.CloseAsync();
+                _connection.Dispose();
+            }
         }
     }
 }
