@@ -20,12 +20,25 @@ export const useSearchProducts = (search: string, page: number = 1, pageSize: nu
 };
 
 export const useElasticsearchSearch = (query: string) => {
-  return useQuery<SearchDocument[]>({
+  return useQuery<Product[]>({
     queryKey: ['search', 'elasticsearch', query],
     queryFn: async () => {
       const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error('Search failed');
-      return res.json();
+      const docs: SearchDocument[] = await res.json();
+
+      const enriched = await Promise.all(
+        docs.map(async (doc) => {
+          try {
+            const fullProduct = await apiClient.getProductById(doc.productId);
+            return fullProduct;
+          } catch {
+            return searchDocToProduct(doc);
+          }
+        })
+      );
+
+      return enriched;
     },
     enabled: query.length >= 2,
     staleTime: 2 * 60 * 1000,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard, Filters, ProductDetailModal } from '@/components';
-import { useProducts, useCategories, useElasticsearchSearch, searchDocToProduct } from '@/hooks';
+import { useProducts, useCategories, useElasticsearchSearch } from '@/hooks';
 import { Product } from '@/types';
 
 export const HomePage: React.FC = () => {
@@ -26,7 +26,7 @@ export const HomePage: React.FC = () => {
 
   const allProducts: Product[] = useMemo(() => {
     if (isSearching && searchResults) {
-      return searchResults.map(searchDocToProduct);
+      return searchResults;
     }
     return productsData?.results || [];
   }, [isSearching, searchResults, productsData]);
