@@ -1,9 +1,8 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useCart } from '@/hooks';
 
 export const Header: React.FC = () => {
-  const navigate = useNavigate();
   const { getTotalItems } = useCart();
   const cartItems = getTotalItems();
 

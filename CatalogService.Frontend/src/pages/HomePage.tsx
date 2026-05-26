@@ -5,7 +5,7 @@ import { useProducts, useCategories } from '@/hooks';
 import { Product } from '@/types';
 
 export const HomePage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -47,10 +47,10 @@ export const HomePage: React.FC = () => {
   ).sort((a, b) => b - a) as number[];
 
   // Obtener rango de precios mínimo y máximo de los productos
-  const priceRange = {
-    min: Math.min(...(productsData?.results || [{ price: 0 }]).map(p => p.price)),
-    max: Math.max(...(productsData?.results || [{ price: 100000000 }]).map(p => p.price)),
-  };
+  // const priceRange = {
+  //   min: Math.min(...(productsData?.results || [{ price: 0 }]).map(p => p.price)),
+  //   max: Math.max(...(productsData?.results || [{ price: 100000000 }]).map(p => p.price)),
+  // };
 
   // Filtrar productos localmente
   const filteredProducts = (productsData?.results || []).filter(product => {
