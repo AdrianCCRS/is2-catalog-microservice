@@ -12,5 +12,7 @@ namespace CatalogService.API.DTOs
         public string? CategoryId { get; set; }
         public List<string>? Images { get; set; }
         public List<string>? Tags { get; set; }
+        public double? Rating { get; set; }
+        public string? Brand { get; set; }
     }
 }

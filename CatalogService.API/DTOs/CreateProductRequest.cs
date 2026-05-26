@@ -12,6 +12,8 @@ namespace CatalogService.API.DTOs
         public string CategoryId { get; set; } = string.Empty;
         public List<string> Images { get; set; } = new();
         public List<string> Tags { get; set; } = new();
+        public double Rating { get; set; }
+        public string Brand { get; set; } = string.Empty;
         public string CreatedBy { get; set; } = string.Empty;
     }
 }

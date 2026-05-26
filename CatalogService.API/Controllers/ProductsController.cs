@@ -13,6 +13,7 @@ namespace CatalogService.API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _repository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IImageValidator _imageValidator;
         private readonly IImportService _importService;
         private readonly IEventPublisher _eventPublisher;
@@ -20,12 +21,14 @@ namespace CatalogService.API.Controllers
 
         public ProductsController(
             IProductRepository repository,
+            ICategoryRepository categoryRepository,
             IImageValidator imageValidator,
             IImportService importService,
             IEventPublisher eventPublisher,
             ILogger<ProductsController> logger)
         {
             _repository = repository;
+            _categoryRepository = categoryRepository;
             _imageValidator = imageValidator;
             _importService = importService;
             _eventPublisher = eventPublisher;
@@ -109,6 +112,8 @@ namespace CatalogService.API.Controllers
                     CategoryId = request.CategoryId,
                     Images = request.Images,
                     Tags = request.Tags,
+                    Rating = request.Rating,
+                    Brand = request.Brand,
                     CreatedBy = request.CreatedBy,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
@@ -120,15 +125,27 @@ namespace CatalogService.API.Controllers
                 // RF-10: Publicar evento ProductCreated
                 try
                 {
+                    var categoryName = await ResolveCategoryName(product.CategoryId);
                     var productCreatedEvent = new ProductCreatedEvent
                     {
-                        ProductId = product.Id,
-                        Name = product.Name,
-                        Price = product.Price,
-                        CreatedBy = product.CreatedBy
+                        Data = new ProductEventData
+                        {
+                            ProductId = product.Id,
+                            Name = product.Name,
+                            Description = product.Description,
+                            Category = categoryName,
+                            Price = (double)product.Price,
+                            Rating = product.Rating,
+                            Available = product.IsActive,
+                            Brand = product.Brand
+                        }
                     };
                     await _eventPublisher.PublishAsync(productCreatedEvent);
                     _logger.LogInformation("Evento ProductCreated publicado para producto {ProductId}", product.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error publicando evento ProductCreated para producto {ProductId}", product.Id);
                 }
                 catch (Exception ex)
                 {
@@ -189,6 +206,12 @@ namespace CatalogService.API.Controllers
                 if (request.Tags != null)
                     existingProduct.Tags = request.Tags;
 
+                if (request.Rating.HasValue)
+                    existingProduct.Rating = request.Rating.Value;
+
+                if (!string.IsNullOrWhiteSpace(request.Brand))
+                    existingProduct.Brand = request.Brand;
+
                 existingProduct.UpdatedAt = DateTime.UtcNow;
 
                 await _repository.UpdateAsync(existingProduct);
@@ -196,12 +219,20 @@ namespace CatalogService.API.Controllers
                 // RF-10: Publicar evento ProductUpdated
                 try
                 {
+                    var categoryName = await ResolveCategoryName(existingProduct.CategoryId);
                     var productUpdatedEvent = new ProductUpdatedEvent
                     {
-                        ProductId = existingProduct.Id,
-                        Name = existingProduct.Name,
-                        Price = existingProduct.Price,
-                        UpdatedBy = "admin"
+                        Data = new ProductEventData
+                        {
+                            ProductId = existingProduct.Id,
+                            Name = existingProduct.Name,
+                            Description = existingProduct.Description,
+                            Category = categoryName,
+                            Price = (double)existingProduct.Price,
+                            Rating = existingProduct.Rating,
+                            Available = existingProduct.IsActive,
+                            Brand = existingProduct.Brand
+                        }
                     };
                     await _eventPublisher.PublishAsync(productUpdatedEvent);
                     _logger.LogInformation("Evento ProductUpdated publicado para producto {ProductId}", existingProduct.Id);
@@ -253,6 +284,12 @@ namespace CatalogService.API.Controllers
 
             if (request.Tags != null)
                 existingProduct.Tags = request.Tags;
+
+            if (request.Rating.HasValue)
+                existingProduct.Rating = request.Rating.Value;
+
+            if (!string.IsNullOrWhiteSpace(request.Brand))
+                existingProduct.Brand = request.Brand;
 
             existingProduct.UpdatedAt = DateTime.UtcNow;
 
@@ -490,6 +527,22 @@ namespace CatalogService.API.Controllers
             // Devolver URL
             var imageUrl = $"http://localhost:5290/images/{fileName}";
             return Ok(new { url = imageUrl });
+        }
+
+        private async Task<string> ResolveCategoryName(string categoryId)
+        {
+            if (string.IsNullOrWhiteSpace(categoryId))
+                return string.Empty;
+
+            try
+            {
+                var category = await _categoryRepository.GetByIdAsync(categoryId);
+                return category?.Name ?? categoryId;
+            }
+            catch
+            {
+                return categoryId;
+            }
         }
     }
 }

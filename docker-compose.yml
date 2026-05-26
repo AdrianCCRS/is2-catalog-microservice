@@ -1,15 +1,48 @@
-version: '3.8'
-
 services:
   mongo-catalog:
     image: mongo:6.0
-    container_name: catalog-mongo
-    ports:
-      - "27017:27017"
+    container_name: catalog_mongodb
     environment:
       MONGO_INITDB_DATABASE: CatalogDb
+    ports:
+      - "27017:27017"
     volumes:
-      - catalog-mongo-data:/data/db
+      - catalog_mongo_data:/data/db
+    networks:
+      - search-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  catalog-api:
+    build:
+      context: ./CatalogService.API
+      dockerfile: Dockerfile
+    container_name: catalog_api
+    ports:
+      - "5290:5290"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5290
+      - MongoDbSettings__ConnectionString=mongodb://catalog_mongodb:27017
+      - MongoDbSettings__DatabaseName=CatalogDb
+      - RabbitMQ__Host=search_rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=${RABBITMQ_USER:-guest}
+      - RabbitMQ__Password=${RABBITMQ_PASS:-guest}
+    depends_on:
+      mongo-catalog:
+        condition: service_healthy
+    networks:
+      - search-network
+    restart: always
 
 volumes:
-  catalog-mongo-data:
+  catalog_mongo_data:
+
+networks:
+  search-network:
+    external: true

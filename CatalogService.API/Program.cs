@@ -26,7 +26,7 @@ builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();  // HU-10
 builder.Services.AddScoped<IImageValidator, ImageValidator>();
 builder.Services.AddScoped<IAuditService, AuditService>();              // HU-10
 builder.Services.AddScoped<IImportService, ImportService>();            // HU-11
-builder.Services.AddScoped<IEventPublisher, EventPublisher>();          // RabbitMQ
+builder.Services.AddSingleton<IEventPublisher, EventPublisher>();          // RabbitMQ (singleton: conexión persistente)
 
 // JWT Configuration
 var jwtSettings = new JwtSettings();

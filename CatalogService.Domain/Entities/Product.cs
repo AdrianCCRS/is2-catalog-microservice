@@ -35,6 +35,12 @@ namespace CatalogService.Domain.Entities
         [BsonElement("tags")]
         public List<string> Tags { get; set; } = new();
 
+        [BsonElement("rating")]
+        public double Rating { get; set; }
+
+        [BsonElement("brand")]
+        public string Brand { get; set; } = string.Empty;
+
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
