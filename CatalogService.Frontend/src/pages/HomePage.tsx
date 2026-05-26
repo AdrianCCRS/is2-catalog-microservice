@@ -62,8 +62,9 @@ export const HomePage: React.FC = () => {
 
   // Filtrar productos localmente
   const filteredProducts = allProducts.filter(product => {
-    // Filtro por búsqueda
-    const matchesSearch = !searchQuery || 
+    // Cuando se usa Elasticsearch, el filtro textual ya lo hizo el backend
+    // (incluyendo fuzziness). Solo aplicamos filtros locales.
+    const matchesSearch = isSearching || !searchQuery || 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
 
