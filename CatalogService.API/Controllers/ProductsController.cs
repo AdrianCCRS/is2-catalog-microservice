@@ -479,6 +479,30 @@ namespace CatalogService.API.Controllers
 
                     await _repository.CreateAsync(product);
                     createdCount++;
+
+                    try
+                    {
+                        var categoryName = await ResolveCategoryName(product.CategoryId);
+                        var productCreatedEvent = new ProductCreatedEvent
+                        {
+                            Data = new ProductEventData
+                            {
+                                ProductId = product.Id,
+                                Name = product.Name,
+                                Description = product.Description,
+                                Category = categoryName,
+                                Price = (double)product.Price,
+                                Rating = product.Rating,
+                                Available = product.IsActive,
+                                Brand = product.Brand
+                            }
+                        };
+                        await _eventPublisher.PublishAsync(productCreatedEvent);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error publicando evento para demo car {ProductId}", product.Id);
+                    }
                 }
 
                 _logger.LogInformation("Se cargaron {Count} carros de demostración exitosamente", createdCount);

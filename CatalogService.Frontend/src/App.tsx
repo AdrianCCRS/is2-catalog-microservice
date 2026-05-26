@@ -9,7 +9,7 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
+      <Router basename="/catalog">
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-grow">

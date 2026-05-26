@@ -40,6 +40,17 @@ services:
       - deploy_search-network
     restart: always
 
+  catalog-frontend:
+    build:
+      context: ./CatalogService.Frontend
+      dockerfile: Dockerfile
+    container_name: catalog_frontend
+    depends_on:
+      - catalog-api
+    networks:
+      - deploy_search-network
+    restart: always
+
 volumes:
   catalog_mongo_data:
 
