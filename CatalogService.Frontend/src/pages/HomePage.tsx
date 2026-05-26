@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard, Filters, ProductDetailModal } from '@/components';
-import { useProducts, useCategories } from '@/hooks';
+import { useProducts, useCategories, useElasticsearchSearch, searchDocToProduct } from '@/hooks';
 import { Product } from '@/types';
 
 export const HomePage: React.FC = () => {
@@ -18,8 +18,20 @@ export const HomePage: React.FC = () => {
 
   const pageSize = 12;
   const { data: productsData, isLoading, error } = useProducts(page, pageSize);
+  const { data: searchResults, isLoading: isSearchLoading } = useElasticsearchSearch(searchQuery);
   const { data: categoriesData } = useCategories();
   const categories = Array.isArray(categoriesData) ? categoriesData : [];
+
+  const isSearching = searchQuery.length >= 2;
+
+  const allProducts: Product[] = useMemo(() => {
+    if (isSearching && searchResults) {
+      return searchResults.map(searchDocToProduct);
+    }
+    return productsData?.results || [];
+  }, [isSearching, searchResults, productsData]);
+
+  const loading = isSearching ? isSearchLoading : isLoading;
 
   // Función para extraer la marca del nombre del producto
   const extractBrand = (name: string): string => {
@@ -35,25 +47,19 @@ export const HomePage: React.FC = () => {
 
   // Extraer marcas y años únicos de los productos
   const brands = Array.from(
-    new Set((productsData?.results || []).map(product => extractBrand(product.name)))
+    new Set(allProducts.map(product => extractBrand(product.name)))
   ).filter(Boolean) as string[];
 
   const years = Array.from(
     new Set(
-      (productsData?.results || [])
+      allProducts
         .map(product => extractYear(product.name))
         .filter((year) => year !== null)
     )
   ).sort((a, b) => b - a) as number[];
 
-  // Obtener rango de precios mínimo y máximo de los productos
-  // const priceRange = {
-  //   min: Math.min(...(productsData?.results || [{ price: 0 }]).map(p => p.price)),
-  //   max: Math.max(...(productsData?.results || [{ price: 100000000 }]).map(p => p.price)),
-  // };
-
   // Filtrar productos localmente
-  const filteredProducts = (productsData?.results || []).filter(product => {
+  const filteredProducts = allProducts.filter(product => {
     // Filtro por búsqueda
     const matchesSearch = !searchQuery || 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -158,7 +164,7 @@ export const HomePage: React.FC = () => {
 
           {/* Grid de Productos */}
           <div className="lg:col-span-3">
-            {isLoading ? (
+            {loading ? (
               <div className="text-center py-12">
                 <p className="text-gray-600 text-lg">Cargando productos...</p>
               </div>

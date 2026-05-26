@@ -13,6 +13,17 @@ export interface Product {
   isActive: boolean;
 }
 
+export interface SearchDocument {
+  productId: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  rating: number;
+  available: boolean;
+  brand: string;
+}
+
 export interface Category {
   id: string;
   name: string;
