@@ -45,6 +45,19 @@ export const useElasticsearchSearch = (query: string) => {
   });
 };
 
+export const useSuggestions = (query: string) => {
+  return useQuery<string[]>({
+    queryKey: ['search', 'suggest', query],
+    queryFn: async () => {
+      const res = await fetch(`/api/search/suggest?q=${encodeURIComponent(query)}`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: query.length >= 2,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 export const useProductById = (id: string) => {
   return useQuery<Product>({
     queryKey: ['products', id],

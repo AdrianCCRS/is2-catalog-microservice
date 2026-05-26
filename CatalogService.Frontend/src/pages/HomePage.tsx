@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard, Filters, ProductDetailModal } from '@/components';
-import { useProducts, useCategories, useElasticsearchSearch } from '@/hooks';
+import { useProducts, useCategories, useElasticsearchSearch, useSuggestions } from '@/hooks';
 import { Product } from '@/types';
 
 export const HomePage: React.FC = () => {
@@ -15,10 +15,12 @@ export const HomePage: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState(100000000);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const pageSize = 12;
   const { data: productsData, isLoading, error } = useProducts(page, pageSize);
   const { data: searchResults, isLoading: isSearchLoading } = useElasticsearchSearch(searchQuery);
+  const { data: suggestions } = useSuggestions(searchQuery);
   const { data: categoriesData } = useCategories();
   const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
@@ -130,17 +132,37 @@ export const HomePage: React.FC = () => {
         <p className="text-gray-600 mb-8">Encuentra el auto perfecto para ti</p>
 
         {/* Buscador */}
-        <div className="mb-8">
+        <div className="mb-8 relative">
           <input
             type="text"
             placeholder="Buscar vehículos por nombre, marca o características..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
+              setShowSuggestions(true);
               setPage(1);
             }}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white text-gray-800"
           />
+          {showSuggestions && suggestions && suggestions.length > 0 && (
+            <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto">
+              {suggestions.map((s, i) => (
+                <li
+                  key={i}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setSearchQuery(s);
+                    setShowSuggestions(false);
+                  }}
+                  className="px-4 py-2 cursor-pointer hover:bg-blue-50 text-gray-700 border-b border-gray-100 last:border-b-0"
+                >
+                  {s}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
